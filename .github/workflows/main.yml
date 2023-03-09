@@ -1,0 +1,42 @@
+name: Branch(develop) Workflow
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Installing node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn --frozen-lockfile
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Run unit tests
+        timeout-minutes: 4
+        run: yarn test:coverage
+
+      - name: Build app
+        run: yarn build
+
+      # TODO! Temporarily disable e2e tests as they are broke. They need to be integrated properly
+      # TODO! within the e2e workflow.
+      # - name: Run end-to-end tests
+      #   run: yarn test:e2e:headless
